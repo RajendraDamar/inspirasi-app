@@ -1,16 +1,133 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import CurrentConditions from '../../src/components/weather/CurrentConditions';
+import { RefreshControl, StyleSheet, View, FlatList, Dimensions } from 'react-native';
+import { Card, Title, Paragraph, Text, Avatar, Button } from 'react-native-paper';
 import { useWeatherData } from '../../src/hooks/useWeatherData';
+import useReportsData from '../../src/hooks/useReportsData';
 
-export default function Forecast1() {
-  const { weather } = useWeatherData();
-  const f: any = weather?.forecasts?.[0] || {};
+// Paper Card subcomponents may not be typed consistently across versions; create safe aliases
+const CardContent: any = (Card as any).Content || ((props: any) => props.children);
+
+const screenWidth = Dimensions.get('window').width;
+
+function HeroCard({ weather }: { weather?: any }) {
   return (
-    <ScrollView style={styles.container}>
-      <CurrentConditions temperature={f.temperature} humidity={f.humidity} weather={f.weather} />
-    </ScrollView>
+    <Card elevation={8} style={styles.heroCard}>
+      <CardContent>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View>
+            <Title style={{ color: '#fff' }}>{weather?.location ?? 'Unknown location'}</Title>
+            <Text style={{ color: '#fff', fontSize: 32 }}>{weather?.temperature ?? '--'}°C</Text>
+            <Paragraph style={{ color: '#fff' }}>{weather?.description ?? ''}</Paragraph>
+          </View>
+          <Avatar.Icon size={64} icon="map-marker" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }} />
+        </View>
+      </CardContent>
+    </Card>
   );
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: '#fff' } });
+function ForecastCard({ item }: { item: any }) {
+  return (
+    <Card style={styles.forecastCard} elevation={8}>
+      <CardContent>
+        <Title>{item.time ?? 'Now'}</Title>
+        <Paragraph>{item.summary}</Paragraph>
+        <Text>{item.temperature ?? '--'}°C</Text>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function HomeScreen() {
+  const { weather, refetch: refetchWeather } = useWeatherData();
+  const weatherAny: any = weather;
+  const reportsQuery = useReportsData();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetchWeather?.();
+      await reportsQuery.refetch?.();
+    } catch (e) {
+      // noop
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchWeather, reportsQuery]);
+
+  const forecasts = weatherAny?.forecasts?.slice(0, 6) || [];
+
+  return (
+    <FlatList
+      data={reportsQuery.data || []}
+      keyExtractor={(r: any) => r.id}
+      ListHeaderComponent={() => (
+        <View style={styles.container}>
+          {/* Hero */}
+          <HeroCard weather={weatherAny?.current || weatherAny?.forecasts?.[0]} />
+
+          {/* Today's Forecast carousel */}
+          <View style={{ marginTop: 16 }}>
+            <Text style={styles.sectionTitle}>Today's Forecast</Text>
+            <FlatList
+              horizontal
+              data={forecasts}
+              keyExtractor={(f: any, i) => String(i)}
+              renderItem={({ item }) => <ForecastCard item={item} />}
+              ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+
+          {/* Recent Alerts banner */}
+          {Array.isArray(weatherAny?.alerts) && weatherAny.alerts.length ? (
+            <Card style={{ margin: 16 }} elevation={8}>
+              <CardContent>
+                <Title>Critical Alerts</Title>
+                <Paragraph>{(weatherAny.alerts || []).join('; ')}</Paragraph>
+                <Button mode="contained" onPress={() => {}}>View Alerts</Button>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {/* Latest Reports preview */}
+          <View style={{ marginTop: 8, paddingHorizontal: 16 }}>
+            <Text style={styles.sectionTitle}>Latest Reports</Text>
+            {reportsQuery.isLoading ? (
+              <Paragraph>Loading reports…</Paragraph>
+            ) : (
+              (reportsQuery.data || []).slice(0, 5).map((r: any) => (
+                <Card key={r.id} style={{ marginTop: 8 }} elevation={8}>
+                  <CardContent>
+                    <Title>{r.title || 'Report'}</Title>
+                    <Paragraph numberOfLines={2}>{r.description}</Paragraph>
+                    <Text style={{ marginTop: 8, color: '#666' }}>{new Date(r.createdAt?.seconds ? r.createdAt.seconds * 1000 : r.createdAt || Date.now()).toLocaleString()}</Text>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </View>
+        </View>
+      )}
+      renderItem={({ item }) => (
+        <Card style={{ marginHorizontal: 16, marginBottom: 8 }} elevation={8}>
+          <CardContent>
+            <Title>{item.title || 'Report'}</Title>
+            <Paragraph numberOfLines={2}>{item.description}</Paragraph>
+          </CardContent>
+        </Card>
+      )}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      ListEmptyComponent={<View style={{ padding: 16 }}><Paragraph>No reports yet.</Paragraph></View>}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { backgroundColor: '#fff' },
+  heroCard: { margin: 16, backgroundColor: '#1976D2', borderRadius: 12 },
+  forecastCard: { width: Math.min(140, screenWidth * 0.35), margin: 8 },
+  sectionTitle: { fontSize: 18, marginLeft: 16, fontWeight: '600' },
+});
