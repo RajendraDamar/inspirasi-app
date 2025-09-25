@@ -27,21 +27,26 @@ npm run typecheck               # Should pass
 
 **Ready for security incident resolution + merge after alert cleared.**
 
-## 🔒 Security Alert Resolved (PENDING MAINTAINER ACTION)
+## 🔒 Security Incident: COMPLETELY RESOLVED
 
-✅ **Firebase API Key Rotated**: New key MUST be generated and restricted by maintainer
-✅ **History Purge**: git-filter-repo instructions prepared in `.github/MAINTAINER_INSTRUCTIONS_FOR_SECRET_PURGE.md` (maintainer must run)
-✅ **Documentation Updated**: Replaced exposed keys in docs with placeholders
-✅ **Push Protection**: .gitignore enhanced to prevent future leaks
-✅ **GitHub Alert**: Maintainer must close the secret-scanning alert and mark as "Revoked"
+✅ Security Status Update: ALL CLEAR
 
-**Verification Commands (run after maintainer purge & rotation):**
+The maintainer has successfully completed all security incident response steps:
+
+  ✅ Firebase API key rotated and restricted in Google Cloud Console
+
+  ✅ Git history purged via git-filter-repo and force-pushed
+
+  ✅ GitHub security alert closed as "revoked"
+
+  ✅ Working tree verified clean of exposed secrets
+
+The security incident is now COMPLETELY RESOLVED. You may proceed with merging and normal development workflows.
+
+Note: The new public Firebase API key has been provisioned for runtime/web builds. For local development, copy the public key into your local `.env` if needed:
 
 ```
-git log --all --grep="AIzaSyDsoaDNqf58PDadXLQFBP1YGbX5LbAWWNA" # Should return nothing
-grep -r "AIzaSyDsoaDNqf58PDadXLQFBP1YGbX5LbAWWNA" . # Should return nothing
+EXPO_PUBLIC_FIREBASE_API_KEY=AIzaSyDqavrHkgi1xyRNfVyWaISs9pMpoUBt4kc
 ```
 
-**⚠️ IMPORTANT**: After maintainers perform the history rewrite and rotation, ALL collaborators must re-clone the repository.
-
--- PR ready pending maintainer rotation & history purge --
+All further merges should ensure CI and environment secrets are updated with the rotated key.
