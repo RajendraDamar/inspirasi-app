@@ -1,0 +1,11 @@
+/node_modules
+.expo
+.expo-shared
+.vscode
+.env
+.env.local
+.DS_Store
+.bundle
+npm-debug.log
+yarn-error.log
+package-lock.json
