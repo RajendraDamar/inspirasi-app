@@ -5,7 +5,7 @@ import { useWeatherData } from '../../src/hooks/useWeatherData';
 
 export default function Forecast1() {
   const { weather } = useWeatherData();
-  const f = weather?.forecasts?.[0] || {};
+  const f: any = weather?.forecasts?.[0] || {};
   return (
     <ScrollView style={styles.container}>
       <CurrentConditions temperature={f.temperature} humidity={f.humidity} weather={f.weather} />
