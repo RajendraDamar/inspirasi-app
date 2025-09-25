@@ -95,3 +95,13 @@ Note about forced routes and bottom navigation
 CI E2E note
 - Automatic E2E runs in CI are disabled for this repository per maintainer preference; external MCP browser tools should be used to perform any verification. The GitHub Actions workflow was switched to manual/non-operational so runs must be started explicitly if ever re-enabled.
 
+
+## Environment
+
+This project reads configuration from environment variables. Copy `.env.example` to `.env` during local development and fill the required values.
+
+- `.env.example` contains the list of variables the app expects (Firebase public values and the BMKG API url).
+- Use `EXPO_PUBLIC_*` prefixed variables for values that are safe to expose in web builds. Keep private/secret values (server keys) outside the repository and in CI secrets.
+
+If Firebase is not configured the app will log a warning on startup; calls that require Firebase may throw an error until the required env vars are set. Use `src/services/firebase/config.ts` -> `ensureFirebaseConfigured()` to assert configuration at runtime.
+
