@@ -12,20 +12,16 @@ const queryClient = new QueryClient();
 export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <SafeAreaProvider>
-          <PaperProvider theme={lightTheme}>
-            <AuthProvider>
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="reports" options={{ headerShown: false }} />
-                <Stack.Screen name="auth" options={{ headerShown: false }} />
-              </Stack>
+      <PaperProvider theme={lightTheme}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <SafeAreaProvider>
+              {/* Single routing entry point — let expo-router's <Slot /> handle navigation */}
               <Slot />
-            </AuthProvider>
-          </PaperProvider>
-        </SafeAreaProvider>
-      </QueryClientProvider>
+            </SafeAreaProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </PaperProvider>
     </GestureHandlerRootView>
   );
 }

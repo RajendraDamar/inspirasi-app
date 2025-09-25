@@ -169,4 +169,44 @@ These research notes were added after consulting Context7 parsed docs and are st
 - Implemented 5 forecast tabs scaffold and created domain-specific tabs: `wind.tsx`, `waves.tsx`, `currents.tsx`, `tides.tsx`, and updated `app/(tabs)/_layout.tsx`.
 - Resolved TypeScript errors in the new tab files by using local `any` casts for domain lookups and replacing `Surface` usages with plain Views to avoid react-native-paper typing mismatches.
 
+## 🔥 HOT RELOAD PROTOCOL
+
+### ⚠️ NEVER RESTART SERVER UNNECESSARILY
+**WRONG APPROACH:**
+- Stop server process
+- Run `npm run web` again  
+- Opens new browser tab
+- Wastes time and resources
+
+**✅ CORRECT HOT RELOAD APPROACH:**
+1. **Keep server running** - Expo has hot reload built-in
+2. **Make code changes** - Server automatically rebuilds
+3. **Test immediately** - Use existing Playwright connection
+4. **ONLY restart server** if:
+	- Dependency changes (`package.json` modified)
+	- Environment changes (`.env` modified)
+	- Metro cache corruption (extremely rare)
+
+### 🚀 DEVELOPMENT WORKFLOW
+
+Start server ONCE at beginning of session
+
+nohup npm run web > server.log 2>&1 &
+Make all code changes using hot reload
+No server restarts needed for:
+- Component updates
+- Style changes
+- Logic modifications
+- File additions
+Test changes immediately:
+
+playwright_navigate → http://localhost:8081
+playwright_screenshot → "after-changes.png"
+
+### 💡 HOT RELOAD BENEFITS
+- **Faster development** - No server restart delays
+- **Browser stays open** - No new tabs
+- **State preserved** - React components maintain state
+- **Instant feedback** - See changes immediately
+
 
