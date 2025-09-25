@@ -1,11 +1,11 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import CurrentConditions from '../../src/components/weather/CurrentConditions';
-import { useWeatherData } from '../../src/hooks/useWeatherData';
+import CurrentConditions from '../../../src/components/weather/CurrentConditions';
+import { useWeatherData } from '../../../src/hooks/useWeatherData';
 
-export default function Forecast2() {
+export default function ForecastIndex() {
   const { weather } = useWeatherData();
-  const f: any = weather?.forecasts?.[1] || {};
+  const f: any = weather?.forecasts?.[0] || {};
   return (
     <ScrollView style={styles.container}>
       <CurrentConditions temperature={f.temperature} humidity={f.humidity} weather={f.weather} />

@@ -162,3 +162,11 @@ These research notes were added after consulting Context7 parsed docs and are st
 
 ---
 
+## Recent session actions (brief)
+
+- Migrated app routing from React Navigation to Expo Router (added `app/(tabs)` file-based routes).
+- Ported Auth and Reports screens into `app/auth.tsx` and `app/reports.tsx`.
+- Implemented 5 forecast tabs scaffold and created domain-specific tabs: `wind.tsx`, `waves.tsx`, `currents.tsx`, `tides.tsx`, and updated `app/(tabs)/_layout.tsx`.
+- Resolved TypeScript errors in the new tab files by using local `any` casts for domain lookups and replacing `Surface` usages with plain Views to avoid react-native-paper typing mismatches.
+
+

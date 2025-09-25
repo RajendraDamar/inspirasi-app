@@ -4,11 +4,11 @@ import React from 'react';
 export default function TabsLayout() {
   return (
     <Tabs>
-      <Tabs.Screen name="index" options={{ title: 'Forecast 1' }} />
-      <Tabs.Screen name="forecast2" options={{ title: 'Forecast 2' }} />
-      <Tabs.Screen name="forecast3" options={{ title: 'Forecast 3' }} />
-      <Tabs.Screen name="forecast4" options={{ title: 'Forecast 4' }} />
-      <Tabs.Screen name="forecast5" options={{ title: 'Forecast 5' }} />
+      <Tabs.Screen name="index" options={{ title: 'Weather' }} />
+      <Tabs.Screen name="wind" options={{ title: 'Wind' }} />
+      <Tabs.Screen name="waves" options={{ title: 'Waves' }} />
+      <Tabs.Screen name="currents" options={{ title: 'Currents' }} />
+      <Tabs.Screen name="tides" options={{ title: 'Tides' }} />
     </Tabs>
   );
 }

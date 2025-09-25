@@ -9,3 +9,14 @@
 npm-debug.log
 yarn-error.log
 package-lock.json
+
+# Prevent committing environment files, service account keys and keystores
+.env*
+*.service-account.json
+*.serviceAccount*.json
+*.key.json
+*.p12
+*.jks
+*.keystore
+.eas/
+*.pem
