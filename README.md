@@ -70,27 +70,28 @@ npm run eas:dev
 
 3. Install the generated dev client apk/ipa on your device and open it. Then run the app from the dev client to test background location and push notifications.
 
+
 ## Navigation & E2E (important)
 
-- The app uses React Navigation (bottom-tabs) to implement a Play Store-like layout: a top Appbar with a centered Searchbar and a bottom tab bar with icons and labels.
-- For end-to-end tests we support a simple forcing mechanism via URL query parameter `?e2e=`. Valid values:
-	- `?e2e=home` — render the Home screen directly (useful for Playwright)
+- The app uses React Navigation (bottom-tabs) to implement the main layout: a top Appbar with a centered Searchbar and a bottom tab bar with icons and labels.
+- For end-to-end checks we support a simple forcing mechanism via URL query parameter `?e2e=`. Valid values:
+	- `?e2e=home` — render the Home screen directly
 	- `?e2e=reports` — render the Reports screen directly
 	- `?e2e=auth` — render the Auth screen directly
 
-	This forces a simple, predictable DOM so E2E runners can land on the expected screen without waiting for navigation or auth flows.
+	This forces a simple, predictable DOM so external browser tools can land on the expected screen without waiting for navigation or auth flows.
 
- - E2E runs are handled using the repository's MCP Playwright browser tools. Local terminal Playwright scripts and CI automation have been disabled.
- 
-	If you need to reproduce an E2E run locally for debugging, start the web server and use the `?e2e=` forced-route query parameter to render a deterministic screen; then use the MCP Playwright browser tools to drive the browser.
+	- E2E verification is performed using MCP-provided browser tools. Local terminal test runners and CI-run browser jobs have been removed from the repository.
+	
+	If you need to reproduce an E2E run locally for debugging, start the web server and use the `?e2e=` forced-route query parameter to render a deterministic screen; then use the MCP browser tools to drive the browser.
 
-- The theme is centralized in `src/constants/theme.ts` and applies a Play Store–inspired color palette (Google blue primary and green accent) via `PaperProvider` in `App.tsx`.
+- The theme is centralized in `src/constants/theme.ts` and applies a blue primary palette via `PaperProvider` in `App.tsx`.
 
-If you change navigation structure, keep `?e2e` behavior or update the tests to account for new DOM structure.
+If you change navigation structure, keep `?e2e` behavior or update any external verification flows to account for new DOM structure.
 
 Note about forced routes and bottom navigation
-- The app's forced-route (`?e2e=`) rendering bypasses the Tab.Navigator for deterministic DOM. To still show a bottom bar in forced screens, the project includes a standalone BottomNav fallback (`src/components/common/BottomNav.tsx`) which renders a visual bottom bar on forced pages and navigates by updating `?e2e` in the URL. This keeps forced pages predictable while allowing visual navigation for screenshots and manual testing.
+- The app's forced-route (`?e2e=`) rendering bypasses the Tab.Navigator for deterministic DOM. To still show a bottom bar in forced screens, the project includes a standalone BottomNav fallback (`src/components/common/BottomNav.tsx`) which renders a visual bottom bar on forced pages and navigates by updating `?e2e` in the URL. This keeps forced pages predictable while allowing visual navigation for screenshots and manual verification.
 
-CI E2E note (manual-only)
-- Automatic E2E runs in CI are disabled for this repository per maintainer preference; Playwright tests should be run manually using the Playwright MCP workflow or local orchestration (`npm run e2e:ci`) when required. The GitHub Actions workflow was switched to `workflow_dispatch` so runs must be started explicitly from the Actions UI.
+CI E2E note
+- Automatic E2E runs in CI are disabled for this repository per maintainer preference; external MCP browser tools should be used to perform any verification. The GitHub Actions workflow was switched to manual/non-operational so runs must be started explicitly if ever re-enabled.
 

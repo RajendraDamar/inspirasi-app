@@ -94,7 +94,7 @@ export default function AppNavigator({ initialRouteName, forceAuth }: { initialR
   if (forceAuth || forced === 'auth') return <AuthScreen />;
 
   // If E2E forcing is present, render the forced screen directly to
-  // provide a simple, predictable DOM for Playwright tests.
+  // provide a simple, predictable DOM for external browser verification tools.
   if (forced === 'reports') {
     return (
       <View style={styles.container}>
