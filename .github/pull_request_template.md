@@ -19,6 +19,8 @@ This PR aligns Expo-related dependencies to SDK-54 bundled versions, tightens Ty
 3. npm audit --omit=dev --json > .github/instructions/npm-audit-report-latest.json
 4. Manual smoke test: expo start -> verify basic screens load
 
+Note: running `npx expo prebuild --no-install` failed in this workspace due to an image MIME/parsing error from `jimp` while processing app icons. Please verify image assets in `assets/` (PNG files) are valid; re-encode if needed. This prebuild failure does not block JS-level verification but will affect native builds.
+
 ## Next steps / Follow-up PRs
 
 - Upgrade `firebase` to a patched 10.x/11.x release to resolve `undici` transitive CVEs
