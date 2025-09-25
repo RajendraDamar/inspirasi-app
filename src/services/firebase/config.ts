@@ -28,4 +28,13 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+// Simple runtime guard helpers for callers that require Firebase to be configured.
+export const IS_FIREBASE_CONFIGURED = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+
+export function ensureFirebaseConfigured(): void {
+  if (!IS_FIREBASE_CONFIGURED) {
+    throw new Error('Firebase is not configured. Ensure EXPO_FIREBASE_* or EXPO_PUBLIC_FIREBASE_* env vars are set.');
+  }
+}
+
 export { app, auth, db, storage };
