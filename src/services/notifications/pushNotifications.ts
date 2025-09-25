@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import notificationSender from './notificationSender';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -52,6 +53,36 @@ class PushNotificationService {
     }
 
     return token;
+  }
+
+  /**
+   * Send a notification. In emulator mode it writes to Firestore collection `outgoing_notifications`
+   * and schedules a local notification so the developer device sees it immediately.
+   */
+  async sendNotification(options: {
+    title: string;
+    body: string;
+    category?: 'critical' | 'marine' | 'general';
+    priority?: 'high' | 'normal';
+    targetUserId?: string;
+    data?: Record<string, any>;
+  }) {
+    const payload = {
+      title: options.title,
+      body: options.body,
+      category: options.category || 'general',
+      priority: options.priority || 'normal',
+      targetUserId: options.targetUserId,
+      data: options.data || {},
+    };
+
+    // If running with emulator, persist outgoing notification and schedule local
+    try {
+      await notificationSender.emitNotificationToEmulator(payload as any);
+      await notificationSender.scheduleLocalNotification(payload as any);
+    } catch (e) {
+      console.warn('sendNotification failed', String(e));
+    }
   }
 }
 
