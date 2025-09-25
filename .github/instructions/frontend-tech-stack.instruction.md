@@ -402,7 +402,7 @@ import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDsoaDNqf58PDadXLQFBP1YGbX5LbAWWNA",
+  apiKey: "YOUR_FIREBASE_API_KEY_HERE",
   authDomain: "inspirasi-1.firebaseapp.com", 
   projectId: "inspirasi-1",
   storageBucket: "inspirasi-1.firebasestorage.app",
