@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "Node16",
-    "jsx": "react",
-    "moduleResolution": "node16",
+  "target": "ES2020",
+  "module": "ESNext",
+  "jsx": "react-jsx",
+  "moduleResolution": "bundler",
   "allowJs": true,
   "esModuleInterop": true,
-  "strict": false,
+  "strict": true,
   "noImplicitAny": true,
   "strictNullChecks": true,
     "skipLibCheck": true,
