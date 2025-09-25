@@ -45,9 +45,8 @@ applyTo: '**'
 ## Notable repository facts (authoritative)
 - Routing: uses Expo Router (file-based routing). Do not add conflicting `@react-navigation` packages unless migrating away from Expo Router.
 - The app root layout is `app/_layout.tsx` which wires QueryClientProvider, PaperProvider, and AuthProvider.
-- E2E: There is a GitHub Actions workflow at `.github/workflows/e2e.yml` that runs Playwright but is configured as manual dispatch (`workflow_dispatch`) by maintainer preference. The repository provides `e2e` tests and an `e2e:ci` script that starts the Expo web server and runs Playwright when the server responds.
-- Services & hooks live under `src/services` and `src/hooks` (examples: `bmkgService.ts`, `notificationService.ts`, `locationService.ts`, `useWeatherData.ts`, `useLocation.ts`).
-- Constants: theme and colors examples and BMKG location codes are in the instructions and suggested paths (e.g., `src/constants/colors.ts`, `src/constants/locationCodes.ts`).
+ If CI reliability is needed later, the instructions recommend building a static web export and serving it for external browser verification to avoid Metro flakiness.
+	- Actions: Document local verification steps in README; optionally add a CI pathway that builds a static web bundle and serves it for external browser verification.
 - Firestore rules example: public-read for weather/alerts; `reports` collection allows create only for authenticated users with `user_type == 'fisherman'`.
 
 ## Defaults and examples referenced
@@ -56,18 +55,17 @@ applyTo: '**'
 - `app.json` example in instructions includes plugins: `expo-notifications`, `expo-location`, and web bundler set to `metro`.
 
 ## E2E & CI guidance (maintainer preference)
-- The repo's GitHub Actions e2e workflow is manual dispatch only. Contributors should run E2E locally via the provided `e2e:ci` / `e2e` scripts or manually with Playwright.
-- If CI reliability is needed later, the instructions recommend building a static web export and serving it for Playwright to test against to avoid Metro flakiness.
+ If CI reliability is needed later, the instructions recommend building a static web export and serving it for external browser verification to avoid Metro flakiness.
 
 ## E2E policy (owner preference)
-- The repository owner has mandated that MCP Playwright browser tools (mcp_playwright_browser_*) are the exclusive method to run E2E tests for this project. Local terminal-based Playwright runs and CI-run Playwright jobs are intentionally disabled.
-- As a result:
-	- All Playwright spec files have been removed from the repository to prevent accidental execution; historical test code has been archived outside the repo when needed.
-	- The GitHub Actions Playwright workflow is a no-op and must not run Playwright in automation.
-	- The project `package.json` no longer lists Playwright or related terminal test runners in `devDependencies` and terminal `e2e` scripts have been removed.
-	- `package-lock.json` Playwright entries have been removed/placeholdered to avoid retaining locked Playwright versions; regenerate a fresh lockfile locally with `npm install` if needed.
+ - The repository owner has mandated that MCP-provided browser tools are the exclusive method to run E2E checks for this project. Local terminal-based test runners and CI-run browser jobs have been removed from the repository.
+	- All local E2E spec files that previously depended on local test runners have been removed from the repository to prevent accidental execution; historical test code has been archived outside the repo when needed.
+	- The GitHub Actions E2E workflow is non-operational and will not run local browser test runners in automation.
+	- The project `package.json` no longer lists local terminal-based E2E devDependencies or `e2e` scripts.
+	- `package-lock.json` entries for local test runners were archived; regenerate a fresh lockfile locally with `npm install` if needed.
+ As a result:
 
-Use the MCP Playwright browser tools for any interactive E2E verification or automated checks run by the MCP environment. Local reproduction for debugging should be done by starting the web server and using the `?e2e=` forced-route query parameter together with the MCP Playwright browser calls.
+Use the MCP-provided browser tools for any interactive E2E verification or automated checks run by the MCP environment. Local reproduction for debugging should be done by starting the web server and using the `?e2e=` forced-route query parameter together with MCP browser calls.
 
 ## Security note
 - Example Firebase config appears in the instructions for local/dev usage. Treat any real credentials as secrets: use environment variables or CI secret storage for production deployments. Do not publish production keys.
@@ -98,9 +96,9 @@ These findings reflect a repository scan and recommendations to bring the codeba
 
 - Missing BMKG location constants (Medium): Instructions reference `LOCATION_CODES` (or `src/constants/locationCodes.ts`) but a constants file mapping BMKG location codes is not present. Add `src/constants/locationCodes.ts` to centralize location codes and use it across services and hooks.
 
-- TypeScript strictness & types (Medium): `tsconfig.json` sets `strict: false` and some modules use broad `any` types. Enable stricter checks where feasible and run `npm run typecheck` as a pre-merge check. Fix `// @ts-ignore` and replace `any` with concrete interfaces for services and API responses.
+ - TypeScript strictness & types (Medium): `tsconfig.json` sets `strict: false` and some modules use broad `any` types. Enable stricter checks where feasible and run `npm run typecheck` as a pre-merge check. Fix `// @ts-ignore` and replace `any` with concrete interfaces for services and API responses.
 
-- E2E workflow fragility (Low/Medium): `e2e:ci` uses `npx expo start --web` and `start-server-and-test` which can be flaky on CI because Metro dev server is not a static server. The repo's GitHub Actions uses manual dispatch which is reasonable; for automated CI consider building a static web export and serving it for Playwright tests to improve reliability.
+- E2E workflow fragility (Low/Medium): `e2e:ci` uses `npx expo start --web` and `start-server-and-test` which can be flaky on CI because Metro dev server is not a static server. The repo's GitHub Actions uses manual dispatch which is reasonable; for automated CI consider building a static web export and serving it for external browser verification to improve reliability.
 
 - Caching & offline queue (Info): `src/services/sync/dataSyncManager.ts` implements an offline queue persisted in AsyncStorage which is in line with instructions; ensure robust error handling and logging around retry/backoff.
 
@@ -128,7 +126,7 @@ These findings reflect a repository scan and recommendations to bring the codeba
 
 5) E2E reliability (Low/Medium)
 	- Files: `.github/workflows/e2e.yml`, `package.json` scripts
-	- Actions: Document local E2E steps in README; optionally add a CI pathway that builds a static web bundle and serves it for Playwright.
+	- Actions: Document local E2E steps in README; optionally add a CI pathway that builds a static web bundle and serves it for external browser verification.
 
 ## Where these findings were observed (representative files)
 
@@ -145,6 +143,16 @@ These findings reflect a repository scan and recommendations to bring the codeba
 - Firebase (Auth, Messaging): official docs used to confirm token storage and auth state best practices.
 - Expo & Expo Notifications: official docs for notification registration and background handling.
 - Expo Router: docs for file-based routing and recommended app root layout.
+
+## Research notes: MCP browser tools & Undici
+
+- MCP browser tools: The repository uses external MCP-provided browser tools for interactive verification; local test runners and CI-run browser jobs have been removed. When running verification in an MCP environment, prefer small, declarative verification scripts that rely on the MCP runtime to provide browsers and capture artifacts. If a CI-hosted verification is ever needed, build a static web export and serve it for the external verification tool to avoid Metro flakiness.
+
+- Undici (Context7 ID: /nodejs/undici): undici is a high-performance HTTP client used transitively by Firebase packages. Context7 docs and undici repo tests confirm the API surface (fetch, upgrade, dispatcher) and contain security-related test fixtures. Security guidance:
+	- Vulnerabilities reported by `npm audit` that list `undici` as the transitive dependency are typically resolved by upgrading `@firebase/*` or `firebase` to versions that depend on a safe undici range. Upgrading `firebase` to a patched release (or specific `@firebase/*` packages) is the recommended remediation.
+	- Keep an eye on Node.js versions and bundled fetch implementation changes: newer Node LTS releases change how `undici` is used. When bumping `firebase`, re-run `npm audit` and `npm ls undici` to confirm the resolved `undici` version.
+
+These research notes were added after consulting Context7 parsed docs and are stored here for maintainers and future audits.
 
 ## Next steps I can take (pick any or I will proceed with mine)
 

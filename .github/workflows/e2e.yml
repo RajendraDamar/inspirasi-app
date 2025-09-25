@@ -1,8 +1,8 @@
 name: disabled-e2e-tests
 
-# This workflow is intentionally a no-op. E2E testing with Playwright has been
-# disabled in repository automation per user request. Use mcp_playwright_browser_*
-# tools for local or interactive E2E checks instead.
+# This workflow is intentionally a no-op. The repository contains no local or
+# CI browser test runners; external MCP-provided browser tools should be used
+# for any interactive verification.
 
 on: {}
 
@@ -11,4 +11,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: No-op
-        run: echo "Playwright E2E workflow disabled. Use mcp_playwright_browser_* tools for E2E."
+        run: echo "E2E workflow intentionally disabled. Use external MCP browser tools for verification."
