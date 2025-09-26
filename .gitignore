@@ -1,17 +1,29 @@
+# Dependencies
 /node_modules
-.expo
-.expo-shared
-.vscode
-.env
-.env.local
-.DS_Store
-.bundle
-npm-debug.log
-yarn-error.log
 package-lock.json
 
-# Prevent committing environment files, service account keys and keystores
+# Expo
+.expo/
+.expo-shared/
+web-build/
+dist/
+
+# Environment & Config
 .env*
+.DS_Store
+.vscode/
+
+# Build artifacts
+.bundle/
+android/app/build/
+ios/build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Security - Never commit these
 *.service-account.json
 *.serviceAccount*.json
 *.key.json
@@ -20,13 +32,11 @@ package-lock.json
 *.keystore
 .eas/
 *.pem
-
-# Security - Never commit these
-.env
-.env.*
 google-services.json
 GoogleService-Info.plist
 **/firebase-config.js
 
-# Ignore Playwright MCP artifacts archived in repository (large binary captures)
+# Development artifacts (you probably want these too)
 .playwright-mcp/
+instructions/
+test-results/
