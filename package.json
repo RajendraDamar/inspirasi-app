@@ -9,6 +9,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
+  "capture:ui": "node .github/playwright/capture-ui-screens.js",
     "eas:dev": "eas build --profile development --platform all",
     "eas:build": "eas build --profile production --platform all",
     "build:web": "expo build:web --no-pwa --output-dir web-build || expo export:web --output ./web-build"
@@ -41,6 +42,7 @@
     "@types/react": "~19.0.10",
     "typescript": "~5.8.3",
     "firebase-admin": "^11.12.0",
-    "minimist": "^1.2.8"
+    "minimist": "^1.2.8",
+    "@playwright/test": "^1.40.0"
   }
 }
