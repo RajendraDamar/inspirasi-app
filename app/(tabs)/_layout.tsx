@@ -1,49 +1,55 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Slot, useRouter } from 'expo-router';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import AppHeader from '../../src/components/AppHeader';
+import { LocationProvider } from '../../src/contexts/LocationContext';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import colors from '../../src/theme/colors';
+import spacing from '../../src/theme/spacing';
 
 export default function TabsLayout() {
   const router = useRouter();
 
-  const routes = useMemo(
-    () => [
-      { key: 'home', title: 'Home', route: '/(tabs)/index' },
-      { key: 'forecasts', title: 'Forecasts', route: '/(tabs)/forecasts' },
-      { key: 'library', title: 'Library', route: '/(tabs)/library' },
-    ],
-    []
-  );
+  const tabs = [
+    { name: 'index', title: 'Beranda', route: '/(tabs)/index', key: 'beranda' },
+    { name: 'forecasts', title: 'Prakiraan', route: '/(tabs)/forecasts', key: 'prakiraan' },
+    { name: 'alerts', title: 'Peringatan', route: '/(tabs)/alerts', key: 'peringatan' },
+    { name: 'reports', title: 'Laporan', route: '/(tabs)/reports', key: 'laporan' }
+  ];
 
   const [index, setIndex] = React.useState(0);
-
-  // Avoid trying to navigate during the initial mount before the root
-  // layout is fully mounted. Track initial mount and only run navigation
-  // when `index` changes after mount.
   const mountedRef = React.useRef(false);
+
   React.useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
       return;
     }
-    // When index changes after mount, navigate to the route
-    const r = routes[index];
+    const r = tabs[index];
     if (r) router.replace(r.route);
-  }, [index, router, routes]);
+  }, [index, router, tabs]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Slot />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <LocationProvider>
+        <AppHeader showSearch />
+        <Slot />
+      </LocationProvider>
+
       <View style={styles.tabBar}>
-        {routes.map((r, i) => (
-          <Pressable
-            key={r.key}
-            onPress={() => setIndex(i)}
-            style={styles.tabButton}
-            accessibilityRole="button"
-          >
-            <Text style={i === index ? styles.activeText : styles.inactiveText}>{r.title}</Text>
-          </Pressable>
-        ))}
+        {tabs.map((t, i) => {
+          const active = i === index;
+          const activeColor = t.key === 'peringatan' ? colors.critical : colors.primary;
+          const iconName = t.key === 'beranda' ? 'home' : t.key === 'prakiraan' ? 'weather-partly-cloudy' : t.key === 'peringatan' ? 'alert' : 'clipboard-text';
+          return (
+            <Pressable key={t.key} onPress={() => setIndex(i)} style={styles.tabButton} accessibilityRole="button">
+              <View style={{ alignItems: 'center' }}>
+                <MaterialCommunityIcons name={iconName as any} size={24} color={active ? activeColor : '#49454F'} />
+                <Text style={[styles.label, { color: active ? activeColor : '#49454F' }]}>{t.title}</Text>
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );
@@ -51,22 +57,24 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 56,
+    height: 64,
     flexDirection: 'row',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e0e0e0',
-    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF'
   },
   tabButton: {
     flex: 1,
+    paddingVertical: 8,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
-  activeText: {
-    color: '#1976D2',
-    fontWeight: '600',
+  icon: {
+    fontSize: 24
   },
-  inactiveText: {
-    color: '#333',
-  },
+  label: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 4
+  }
 });

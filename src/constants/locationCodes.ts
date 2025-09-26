@@ -12,3 +12,6 @@ export const LOCATION_CODES: { [key: string]: string } = {
 };
 
 export default LOCATION_CODES;
+
+// Bantul / Pantai Depok code used by the app default
+export const BANTUL_PANTAI_DEPOK = '34.04.01.2001';

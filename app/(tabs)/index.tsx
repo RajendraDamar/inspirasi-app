@@ -2,6 +2,7 @@ import React from 'react';
 import { RefreshControl, StyleSheet, View, FlatList, Dimensions } from 'react-native';
 import { Card, Title, Paragraph, Text, Avatar, Button } from 'react-native-paper';
 import { useWeatherData } from '../../src/hooks/useWeatherData';
+import WeatherCard from '../../src/components/WeatherCard';
 import useReportsData from '../../src/hooks/useReportsData';
 import SkeletonCard from '../../src/components/SkeletonCard';
 import ErrorState from '../../src/components/ErrorState';
@@ -12,33 +13,8 @@ const CardContent: any = (Card as any).Content || ((props: any) => props.childre
 
 const screenWidth = Dimensions.get('window').width;
 
-function HeroCard({ weather }: { weather?: any }) {
-  return (
-    <Card elevation={8} style={styles.heroCard}>
-      <CardContent>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View>
-            <Title style={{ color: '#fff' }}>{weather?.location ?? 'Unknown location'}</Title>
-            <Text style={{ color: '#fff', fontSize: 32 }}>{weather?.temperature ?? '--'}°C</Text>
-            <Paragraph style={{ color: '#fff' }}>{weather?.description ?? ''}</Paragraph>
-          </View>
-          <Avatar.Icon size={64} icon="map-marker" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }} />
-        </View>
-      </CardContent>
-    </Card>
-  );
-}
-
 function ForecastCard({ item }: { item: any }) {
-  return (
-    <Card style={styles.forecastCard} elevation={8}>
-      <CardContent>
-        <Title>{item.time ?? 'Now'}</Title>
-        <Paragraph>{item.summary}</Paragraph>
-        <Text>{item.temperature ?? '--'}°C</Text>
-      </CardContent>
-    </Card>
-  );
+  return <WeatherCard variant="forecast" title={item.time || new Date(item.datetime).toLocaleTimeString()} subtitle={item.weather} />;
 }
 
 export default function HomeScreen() {
@@ -75,12 +51,17 @@ export default function HomeScreen() {
           ) : (!weatherAny || !weatherAny.forecasts || !weatherAny.forecasts.length) ? (
             <EmptyState title="No weather data" description="No weather data available" />
           ) : (
-            <HeroCard weather={weatherAny?.current || weatherAny?.forecasts?.[0]} />
+            <WeatherCard
+              variant="hero"
+              title={`${weatherAny.location?.village || ''}, ${weatherAny.location?.city || ''}`}
+              subtitle={weatherAny.forecasts?.[0]?.weather}
+              value={String(weatherAny.forecasts?.[0]?.temperature)}
+            />
           )}
 
           {/* Today's Forecast carousel */}
           <View style={{ marginTop: 16 }}>
-            <Text style={styles.sectionTitle}>Today's Forecast</Text>
+            <Text style={styles.sectionTitle}>Prakiraan Hari Ini</Text>
             <FlatList
               horizontal
               data={forecasts}
@@ -92,15 +73,41 @@ export default function HomeScreen() {
             />
           </View>
 
+          {/* Marine 2x2 grid */}
+          <View style={{ marginTop: 16, paddingHorizontal: 16 }}>
+            <Text style={styles.sectionTitle}>Kondisi Laut</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <View style={{ width: '48%' }}>
+                <WeatherCard variant="marine" title="Gelombang" value={`${weatherAny.marine?.waveHeight ?? '--'} m`}>
+                  <Paragraph>{weatherAny.marine?.waveCategory}</Paragraph>
+                </WeatherCard>
+              </View>
+              <View style={{ width: '48%' }}>
+                <WeatherCard variant="marine" title="Angin" value={`${weatherAny.marine?.windSpeed ?? '--'} m/s`}>
+                  <Paragraph>{weatherAny.marine?.visibility}</Paragraph>
+                </WeatherCard>
+              </View>
+              <View style={{ width: '48%' }}>
+                <WeatherCard variant="marine" title="Arus" value={`${weatherAny.marine?.currents?.speed ?? '--'} m/s`}>
+                  <Paragraph>{weatherAny.marine?.currents?.direction}</Paragraph>
+                </WeatherCard>
+              </View>
+              <View style={{ width: '48%' }}>
+                <WeatherCard variant="marine" title="Pasang Surut" value={`H:${new Date(weatherAny.marine?.tide?.nextHigh).toLocaleTimeString()}`}>
+                  <Paragraph>L:{new Date(weatherAny.marine?.tide?.nextLow).toLocaleTimeString()}</Paragraph>
+                </WeatherCard>
+              </View>
+            </View>
+          </View>
+
           {/* Recent Alerts banner */}
-          {Array.isArray(weatherAny?.alerts) && weatherAny.alerts.length ? (
-            <Card style={{ margin: 16 }} elevation={8}>
-              <CardContent>
-                <Title>Critical Alerts</Title>
-                <Paragraph>{(weatherAny.alerts || []).join('; ')}</Paragraph>
-                <Button mode="contained" onPress={() => {}}>View Alerts</Button>
-              </CardContent>
-            </Card>
+          {Array.isArray(weatherAny?.marine?.warnings) && weatherAny.marine.warnings.length ? (
+            <View style={{ marginTop: 16, paddingHorizontal: 16 }}>
+              <Text style={styles.sectionTitle}>Peringatan</Text>
+              {(weatherAny.marine.warnings || []).map((a: any) => (
+                <WeatherCard key={a.id} variant="alert" severity={a.severity} title={a.title} subtitle={a.message} />
+              ))}
+            </View>
           ) : null}
 
           {/* Latest Reports preview */}

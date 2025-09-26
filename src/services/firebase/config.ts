@@ -3,7 +3,10 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { connectAuthEmulator } from 'firebase/auth';
-import { getMessaging } from 'firebase/messaging';
+// Note: we avoid calling getMessaging in environments where the browser APIs
+// required by Firebase Messaging are not available (server-side bundlers,
+// Node, or limited browser contexts). We'll import and initialize it only
+// when it's safe.
 
 // Read Firebase configuration only from environment variables.
 // Use EXPO_PUBLIC_* for values safe to expose to web, and non-public vars for server-only secrets.
@@ -33,13 +36,34 @@ const storage = getStorage(app);
 // Initialize Firebase Cloud Messaging for supported platforms (web/PWA).
 // Important: per thesis requirements, FCM must use the real service. We intentionally do NOT
 // connect the Messaging service to any local emulator even when other services use emulators.
-let messaging: ReturnType<typeof getMessaging> | null = null;
+let messaging: any = null;
+// Only attempt to initialize Firebase Messaging when running in a browser-like
+// environment that exposes `window` and `navigator` (service worker support).
+// This prevents the Firebase SDK from throwing `messaging/unsupported-browser`
+// during the Metro bundling phase or when running on Node.
 try {
-  // getMessaging will throw in some non-browser/native contexts; guard it.
-  messaging = getMessaging(app);
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+    // Importing getMessaging is safe here because we are in a browser context.
+    // Use a dynamic require to avoid bundlers trying to evaluate the module
+    // in Node environments where it may fail.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
+    const { getMessaging } = require('firebase/messaging');
+    try {
+      messaging = getMessaging(app);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Firebase messaging not initialized in this environment', String(e));
+      messaging = null;
+    }
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn('Skipping Firebase messaging initialization: no browser service worker support detected');
+  }
 } catch (e) {
+  // Defensive fallback: if dynamic require/import fails, log and continue.
   // eslint-disable-next-line no-console
-  console.warn('Firebase messaging not initialized in this environment', String(e));
+  console.warn('Firebase messaging initialization guard failed', String(e));
+  messaging = null;
 }
 
 // Connect to Firebase local emulators when developing locally or when explicitly enabled

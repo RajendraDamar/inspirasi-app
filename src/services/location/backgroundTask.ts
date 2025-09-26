@@ -13,7 +13,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }: any) => {
   if (data) {
     const { locations } = data as { locations: any[] };
     // Here you could persist the locations to AsyncStorage or trigger sync
-    console.log(`Background locations received: ${locations?.length}`);
+  console.debug(`Background locations received: ${locations?.length}`);
     // For now, just store the last location using expo-location storage logic elsewhere
   }
 });

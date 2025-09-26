@@ -21,7 +21,7 @@ Notifications.setNotificationHandler({
 class PushNotificationService {
   async registerForPushNotificationsAsync(userId?: string) {
     if (!Device.isDevice) {
-      console.log('Push notifications require a physical device');
+  console.debug('Push notifications require a physical device');
       return null;
     }
 
