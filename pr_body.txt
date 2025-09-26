@@ -1,11 +1,19 @@
-This PR contains a set of low-risk, instruction-driven improvements:
+Adds a complete Settings UI and backend wiring for user preferences.
 
-- Add src/constants/locationCodes.ts for BMKG location codes
-- Add .env.example documenting required environment variables
-- Update src/services/firebase/config.ts to read config from environment and expose IS_FIREBASE_CONFIGURED and ensureFirebaseConfigured()
-- Enable strict TypeScript (tsconfig.json) and set JSX to react-jsx
-- Add an "Environment" section to README.md
+What this PR includes:
+- Firestore-backed user_preferences service with real-time subscription and AsyncStorage fallback
+- useUserPreferences React Query hook for caching and mutation
+- SettingsContext to provide preferences and save helper
+- app/settings.tsx UI providing language, notification preferences, theme, data & location settings, and security controls
 
-Audit note: An npm audit still reports a small set of vulnerabilities (1 moderate, 5 high). The undici advisory is transitive (coming from CLI tooling expo -> @expo/cli -> undici). I recommend a separate PR to safely upgrade the Expo CLI / toolchain and reconcile lockfiles.
+Why:
+- Enables per-user preferences persisted to the Firebase emulator and usable offline
 
-Commit: e073516
+How to test:
+1. Start Firebase emulators (firestore at :8200)
+2. Start the app (expo web) and navigate to /settings
+3. Sign in or ensure a test user exists; edit preferences and click Save. Verify Firestore emulator shows data under user_preferences/<uid> and UI updates.
+
+Notes:
+- Type-safe implementation with TypeScript and React Query
+- Uses project patterns for guarded react-native-paper imports
