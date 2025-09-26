@@ -1,9 +1,0 @@
-INFO: Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
-LOG: Running application "main" with appParams: {rootTag: #root, hydrate: undefined}
-WARNING: "shadow*" style props are deprecated. Use "boxShadow".
-WARNING: props.pointerEvents is deprecated. Use style.pointerEvents
-INFO: Slow network is detected. Fallback font will be used.
-ERROR: Failed to load resource: 404 https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=3171010001
-WARNING: Failed to fetch reports FirebaseError: Missing or insufficient permissions.
-ERROR: Failed to load resource: 404 https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=3171010001
-ERROR: Failed to load resource: 404 https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=3171010001

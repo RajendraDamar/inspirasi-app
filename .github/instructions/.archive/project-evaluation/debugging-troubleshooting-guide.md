@@ -1,4 +1,0 @@
-````markdown
-# 🐛 DEBUGGING & TROUBLESHOOTING GUIDE
-...
-````
