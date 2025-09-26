@@ -1,8 +1,10 @@
-// Use guarded requires for react-native-paper export shape compatibility
+// Centralized MD3 theme for Inspirasi app
+// Single guarded implementation to support multiple react-native-paper export shapes
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const rnp = require('react-native-paper');
-const MD3LightTheme = (rnp && rnp.MD3LightTheme) || rnp.default?.MD3LightTheme || rnp.default || {};
-const MD3DarkTheme = (rnp && rnp.MD3DarkTheme) || rnp.default?.MD3DarkTheme || rnp.default || {};
+const rnp: any = require('react-native-paper');
+
+const MD3LightTheme = rnp?.MD3LightTheme || rnp?.default?.MD3LightTheme || rnp?.default || {};
+const MD3DarkTheme = rnp?.MD3DarkTheme || rnp?.default?.MD3DarkTheme || rnp?.default || {};
 
 export const lightTheme: any = {
   ...MD3LightTheme,

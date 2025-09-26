@@ -31,57 +31,66 @@ function SettingsForm() {
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <List.Section title="Account" style={styles.section}>
-        <List.Item title={auth?.user?.displayName || 'Guest'} description={auth?.user?.email || ''} left={() => <List.Icon icon="account" />} />
+        <List.Item
+          title={auth?.user?.displayName || 'Guest'}
+          description={auth?.user?.email || ''}
+          left={() => <List.Icon icon="account" />}
+        />
+        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+          <Text variant="bodyMedium">{auth?.user?.role || 'User'}</Text>
+        </View>
       </List.Section>
 
       <Divider />
 
       <List.Section title="Preferences" style={styles.section}>
-        <SegmentedButtons
-          value={local.theme}
-          onValueChange={(v: any) => setLocal({ ...local, theme: v })}
-          buttons={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'System' }]}
-        />
+        <List.Item title="Theme" description="App theme preference" />
+        <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+          <SegmentedButtons
+            value={local.theme}
+            onValueChange={(v: any) => setLocal({ ...local, theme: v })}
+            buttons={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'System' }]}
+          />
+        </View>
 
-        <View style={{ marginTop: 12 }}>
-          <Text>Language</Text>
+        <List.Item title="Language" description={local.language === 'id' ? 'Bahasa' : 'English'} />
+        <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
           <SegmentedButtons
             value={local.language}
             onValueChange={(v: any) => setLocal({ ...local, language: v })}
             buttons={[{ value: 'id', label: 'Bahasa' }, { value: 'en', label: 'English' }]}
           />
         </View>
+
+        <List.Item title="Location" description={local.defaultLocationCode || 'Not set'} right={() => <Button onPress={() => {}}>Change</Button>} />
       </List.Section>
 
       <Divider />
 
       <List.Section title="Notifications" style={styles.section}>
-        <List.Item title="Push" right={() => <Switch value={!!local.notifications?.push} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, push: v } })} />} />
-        <List.Item title="Email" right={() => <Switch value={!!local.notifications?.email} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, email: v } })} />} />
-        <List.Item title="SMS" right={() => <Switch value={!!local.notifications?.sms} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, sms: v } })} />} />
+        <List.Item
+          title="Weather alerts"
+          right={() => <Switch value={!!local.notifications?.alerts} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, alerts: v } })} />}
+        />
+        <List.Item
+          title="Critical only"
+          right={() => <Switch value={!!local.notifications?.criticalOnly} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, criticalOnly: v } })} />}
+        />
       </List.Section>
 
       <Divider />
 
-      <List.Section title="Data & Location" style={styles.section}>
-        <TextInput label="Refresh interval (minutes)" keyboardType="numeric" value={String(local.refreshIntervalMinutes)} onChangeText={(t: string) => setLocal({ ...local, refreshIntervalMinutes: Number(t) || 0 })} />
-        <TextInput label="Default location code" value={local.defaultLocationCode || ''} onChangeText={(t: string) => setLocal({ ...local, defaultLocationCode: t })} />
-        <List.Item title="Use GPS" right={() => <Switch value={!!local.useGps} onValueChange={(v: boolean) => setLocal({ ...local, useGps: v })} />} />
-      </List.Section>
-
-      <Divider />
-
-      <List.Section title="Data Sources & Cache" style={styles.section}>
-        <TextInput label="BMKG API endpoint" value={local.bmkgApiEndpoint || ''} onChangeText={(t: string) => setLocal({ ...local, bmkgApiEndpoint: t })} />
-        <TextInput label="Cache duration (minutes)" keyboardType="numeric" value={String(local.cacheDurationMinutes)} onChangeText={(t: string) => setLocal({ ...local, cacheDurationMinutes: Number(t) || 0 })} />
+      <List.Section title="Data Privacy & Cache" style={styles.section}>
+        <List.Item title="Clear cached data" description="Remove offline caches and local DB" right={() => <Button mode="outlined" onPress={() => { /* implement clear cache */ }}>Clear</Button>} />
+        <List.Item title="Privacy policy" right={() => <Button onPress={() => { /* open policy */ }}>Open</Button>} />
         <List.Item title="Offline mode" right={() => <Switch value={!!local.offlineMode} onValueChange={(v: boolean) => setLocal({ ...local, offlineMode: v })} />} />
       </List.Section>
 
       <Divider />
 
-      <List.Section title="Security" style={styles.section}>
-        <List.Item title={`Signed in: ${auth?.user ? 'Yes' : 'No'}`} />
-        {auth?.user ? <Button mode="outlined" onPress={() => auth.logout()}>Sign out</Button> : null}
+      <List.Section title="Data Sources" style={styles.section}>
+        <TextInput label="BMKG API endpoint" value={local.bmkgApiEndpoint || ''} onChangeText={(t: string) => setLocal({ ...local, bmkgApiEndpoint: t })} />
+        <TextInput label="Cache duration (minutes)" keyboardType="numeric" value={String(local.cacheDurationMinutes)} onChangeText={(t: string) => setLocal({ ...local, cacheDurationMinutes: Number(t) || 0 })} />
       </List.Section>
 
       <View style={{ padding: 16 }}>
