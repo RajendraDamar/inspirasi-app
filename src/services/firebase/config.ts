@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { connectAuthEmulator } from 'firebase/auth';
+import { getMessaging } from 'firebase/messaging';
 
 // Read Firebase configuration only from environment variables.
 // Use EXPO_PUBLIC_* for values safe to expose to web, and non-public vars for server-only secrets.
@@ -28,6 +29,18 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig as any) : getA
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+// Initialize Firebase Cloud Messaging for supported platforms (web/PWA).
+// Important: per thesis requirements, FCM must use the real service. We intentionally do NOT
+// connect the Messaging service to any local emulator even when other services use emulators.
+let messaging: ReturnType<typeof getMessaging> | null = null;
+try {
+  // getMessaging will throw in some non-browser/native contexts; guard it.
+  messaging = getMessaging(app);
+} catch (e) {
+  // eslint-disable-next-line no-console
+  console.warn('Firebase messaging not initialized in this environment', String(e));
+}
 
 // Connect to Firebase local emulators when developing locally or when explicitly enabled
 // Enable by setting EXPO_USE_FIREBASE_EMULATOR=true or running with NODE_ENV=development
@@ -64,4 +77,4 @@ if (useEmulator) {
   console.info('Firebase: connected to local emulators (auth:9099, firestore:8200, storage:9199)');
 }
 
-export { app, auth, db, storage };
+export { app, auth, db, storage, messaging };
