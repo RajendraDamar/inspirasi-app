@@ -83,6 +83,48 @@ NEVER restart the web dev server unnecessarily.
 - Keep `npm run web` running and rely on hot reload for code changes.
 - Restart only when you change `package.json`, native modules, or environment variables.
 
+## CRITICAL SERVER MANAGEMENT PROTOCOL
+
+### 🔥 NEVER RESTART THESE SERVERS UNLESS PACKAGE.JSON CHANGES
+- ✅ Firebase Emulator: `npx firebase emulators:start` (KEEP RUNNING)
+- ✅ Expo Dev Server: `npm run web` (KEEP RUNNING)
+- ✅ These run for HOURS - use hot reload for all code changes
+
+### ⚠️ WHEN TO RESTART (Only These Cases)
+- package.json dependencies change
+- Firebase emulator crashes
+- User explicitly says "restart server"
+- Otherwise: NEVER restart, use hot reload
+
+### 🚫 PROHIBITED ACTIONS
+- Starting `npm run web` when server already running
+- Starting Firebase emulator when already running
+- Restarting for TypeScript changes (hot reload handles this)
+- Restarting for new files (hot reload handles this)
+
+### ✅ HOT RELOAD HANDLES
+- New files (library.tsx, components)
+- TypeScript changes
+- UI component updates
+- Firebase config updates
+- All code changes except package.json
+
+### 📋 DEVELOPMENT WORKFLOW MEMORY
+Terminal 1: Firebase emulator (keep running)
+Terminal 2: `npm run web` (keep running)
+Terminal 3: Testing commands only
+
+REMEMBER: The servers are designed to run continuously. Hot reload is THE workflow.
+
+### 🎯 IMMEDIATE CORRECTION
+
+If duplicate servers were started (for example, `npm run web` started twice), fix this now:
+
+1. Stop the extra `npm run web` instance (Ctrl+C in that terminal).
+2. Use the original running server and rely on hot reload.
+3. Test Library tab with hot reload (it should reflect changes immediately).
+
+
 ## 🤖 PLAYWRIGHT MCP TESTING
 Use the built-in MCP Playwright helpers for all automated UI checks:
 - `playwright_navigate`
