@@ -27,6 +27,15 @@ applyTo: '**'
 - `.github/instructions/configuration.instruction.md`: Firebase initialization snippet, app.json examples, dependency guidance, environment variables, color/theme constants, Firestore rules, BMKG location codes.
 ---
 
+## Recent Automated Session Summary
+
+- Created/updated `.env` with EXPO_PUBLIC_FIREBASE_* variables and wired `src/services/firebase/config.ts` to auto-connect to local Firebase emulators when `EXPO_USE_FIREBASE_EMULATOR=true` or `NODE_ENV=development`.
+- Fixed a web white-screen caused by duplicate root registration by adjusting `App.tsx` to export the router entry directly.
+- Implemented Forecasts UI at `app/(tabs)/forecasts/index.tsx` and wired it to existing hooks (`useWeatherData`, `useMarineForecast`).
+- Ran Playwright MCP browser checks against the running Expo web server; captured screenshots, console logs, and visible text under `.playwright-mcp/` (artifacts include `forecasts-tab-with-content.png`, `forecasts-visible-text.txt`, `console-full.log`).
+- Consolidated repository instructions into five essential `.instruction.md` files and archived legacy docs under `.github/instructions/.archive/`.
+- Added `firebase.json` (emulator config) and `.github/instructions/firebase-emulator.instruction.md` for local emulator guidance.
+
 # User Memory
 
 ## Summary
@@ -63,40 +72,80 @@ applyTo: '**'
 	- The GitHub Actions E2E workflow is non-operational and will not run local browser test runners in automation.
 	- The project `package.json` no longer lists local terminal-based E2E devDependencies or `e2e` scripts.
 	- `package-lock.json` entries for local test runners were archived; regenerate a fresh lockfile locally with `npm install` if needed.
- As a result:
-
-Use the MCP-provided browser tools for any interactive E2E verification or automated checks run by the MCP environment. Local reproduction for debugging should be done by starting the web server and using the `?e2e=` forced-route query parameter together with MCP browser calls.
-
-## Security note
-- Example Firebase config appears in the instructions for local/dev usage. Treat any real credentials as secrets: use environment variables or CI secret storage for production deployments. Do not publish production keys.
-
-## Recommended next steps (from instructions)
-- Keep TypeScript types strict; remove temporary `any` casts and `// @ts-ignore` where feasible and re-run `npm run typecheck`.
-- Document E2E run instructions (`?e2e` usage, `npm run e2e:ci`) in README for contributors.
-- Preserve the manual CI dispatch preference unless maintainers request automated PR/merge-triggered E2E runs.
-
+---
+applyTo: '**'
 ---
 
-If any part of this memory should be changed or removed, tell me which sections to update and I'll revise this file.
-## Notes
+# Development Memory & Protocols
 
-- Default BMKG location code used: 3171010001 (Jakarta)
+## 🔥 HOT RELOAD PROTOCOL
+NEVER restart the web dev server unnecessarily.
+- Keep `npm run web` running and rely on hot reload for code changes.
+- Restart only when you change `package.json`, native modules, or environment variables.
 
-## Navigation & E2E Notes (corrected)
+## CRITICAL SERVER MANAGEMENT PROTOCOL
 
-- Navigation: The project uses Expo Router (file-based routing). Do NOT add conflicting @react-navigation packages unless there's a specific migration reason.
+### 🔥 NEVER RESTART THESE SERVERS UNLESS PACKAGE.JSON CHANGES
+- ✅ Firebase Emulator: `npx firebase emulators:start` (KEEP RUNNING)
+- ✅ Expo Dev Server: `npm run web` (KEEP RUNNING)
+- ✅ These run for HOURS - use hot reload for all code changes
 
-## Codebase audit findings (summary)
+### ⚠️ WHEN TO RESTART (Only These Cases)
+- package.json dependencies change
+- Firebase emulator crashes
+- User explicitly says "restart server"
+- Otherwise: NEVER restart, use hot reload
 
-These findings reflect a repository scan and recommendations to bring the codebase in line with the documented instructions and best practices.
+### 🚫 PROHIBITED ACTIONS
+- Starting `npm run web` when server already running
+- Starting Firebase emulator when already running
+- Restarting for TypeScript changes (hot reload handles this)
+- Restarting for new files (hot reload handles this)
 
-- Routing duplication (High): The codebase contains Expo Router (primary) and a fallback React Navigation `AppNavigator` plus `@react-navigation/*` packages in `package.json`. This increases maintenance burden and can introduce subtle routing/integration bugs. Recommended: choose a single router (prefer Expo Router for this project), remove unused React Navigation packages, and delete or migrate the fallback navigator.
+### ✅ HOT RELOAD HANDLES
+- New files (library.tsx, components)
+- TypeScript changes
+- UI component updates
+- Firebase config updates
+- All code changes except package.json
 
-- Firebase configuration in source (Critical): `src/services/firebase/config.ts` contains an inline `firebaseConfig` object with keys. Move all real credentials to environment variables and use `process.env` (managed by `expo-constants` or `dotenv` in dev). Add `firebaseConfig` to `.env` and ensure CI secrets are used in workflows.
+### 📋 DEVELOPMENT WORKFLOW MEMORY
+Terminal 1: Firebase emulator (keep running)
+Terminal 2: `npm run web` (keep running)
+Terminal 3: Testing commands only
 
-- Missing BMKG location constants (Medium): Instructions reference `LOCATION_CODES` (or `src/constants/locationCodes.ts`) but a constants file mapping BMKG location codes is not present. Add `src/constants/locationCodes.ts` to centralize location codes and use it across services and hooks.
+REMEMBER: The servers are designed to run continuously. Hot reload is THE workflow.
 
- - TypeScript strictness & types (Medium): `tsconfig.json` sets `strict: false` and some modules use broad `any` types. Enable stricter checks where feasible and run `npm run typecheck` as a pre-merge check. Fix `// @ts-ignore` and replace `any` with concrete interfaces for services and API responses.
+### 🎯 IMMEDIATE CORRECTION
+
+If duplicate servers were started (for example, `npm run web` started twice), fix this now:
+
+1. Stop the extra `npm run web` instance (Ctrl+C in that terminal).
+2. Use the original running server and rely on hot reload.
+3. Test Library tab with hot reload (it should reflect changes immediately).
+
+
+## 🤖 PLAYWRIGHT MCP TESTING
+Use the built-in MCP Playwright helpers for all automated UI checks:
+- `playwright_navigate`
+- `playwright_click`
+- `playwright_screenshot`
+- `playwright_console_logs`
+
+## 🚫 NEVER INSTALL
+- Puppeteer (use Playwright MCP)
+- React Navigation (use Expo Router)
+- Any extra testing libraries (MCP provided)
+
+## ✅ SUCCESS PATTERNS
+- Firebase Local Emulator working
+- Bottom tabs functional
+- Forecasts tab implemented
+- Playwright testing established
+
+## ARCHIVE OLD FILES
+When compacting docs, move legacy or deep-dive guides into `.archive/` inside `.github/instructions` to reduce noise.
+
 
 - E2E workflow fragility (Low/Medium): `e2e:ci` uses `npx expo start --web` and `start-server-and-test` which can be flaky on CI because Metro dev server is not a static server. The repo's GitHub Actions uses manual dispatch which is reasonable; for automated CI consider building a static web export and serving it for external browser verification to improve reliability.
 
@@ -168,5 +217,45 @@ These research notes were added after consulting Context7 parsed docs and are st
 - Ported Auth and Reports screens into `app/auth.tsx` and `app/reports.tsx`.
 - Implemented 5 forecast tabs scaffold and created domain-specific tabs: `wind.tsx`, `waves.tsx`, `currents.tsx`, `tides.tsx`, and updated `app/(tabs)/_layout.tsx`.
 - Resolved TypeScript errors in the new tab files by using local `any` casts for domain lookups and replacing `Surface` usages with plain Views to avoid react-native-paper typing mismatches.
+
+## 🔥 HOT RELOAD PROTOCOL
+
+### ⚠️ NEVER RESTART SERVER UNNECESSARILY
+**WRONG APPROACH:**
+- Stop server process
+- Run `npm run web` again  
+- Opens new browser tab
+- Wastes time and resources
+
+**✅ CORRECT HOT RELOAD APPROACH:**
+1. **Keep server running** - Expo has hot reload built-in
+2. **Make code changes** - Server automatically rebuilds
+3. **Test immediately** - Use existing Playwright connection
+4. **ONLY restart server** if:
+	- Dependency changes (`package.json` modified)
+	- Environment changes (`.env` modified)
+	- Metro cache corruption (extremely rare)
+
+### 🚀 DEVELOPMENT WORKFLOW
+
+Start server ONCE at beginning of session
+
+nohup npm run web > server.log 2>&1 &
+Make all code changes using hot reload
+No server restarts needed for:
+- Component updates
+- Style changes
+- Logic modifications
+- File additions
+Test changes immediately:
+
+playwright_navigate → http://localhost:8081
+playwright_screenshot → "after-changes.png"
+
+### 💡 HOT RELOAD BENEFITS
+- **Faster development** - No server restart delays
+- **Browser stays open** - No new tabs
+- **State preserved** - React components maintain state
+- **Instant feedback** - See changes immediately
 
 
