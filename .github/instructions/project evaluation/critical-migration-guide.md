@@ -276,7 +276,7 @@ npm install @tanstack/react-query react-native-paper react-native-vector-icons
 Based on your Firebase config, update:
 ```bash
 # Firebase Configuration
-EXPO_PUBLIC_FIREBASE_API_KEY=REDACTED_FIREBASE_API_KEY
+EXPO_PUBLIC_FIREBASE_API_KEY=AIzaSyDsoaDNqf58PDadXLQFBP1YGbX5LbAWWNA
 EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=inspirasi-1.firebaseapp.com
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=inspirasi-1
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=inspirasi-1.firebasestorage.app

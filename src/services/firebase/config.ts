@@ -1,7 +1,8 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, initializeAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
+import { connectAuthEmulator } from 'firebase/auth';
 
 // Read Firebase configuration only from environment variables.
 // Use EXPO_PUBLIC_* for values safe to expose to web, and non-public vars for server-only secrets.
@@ -28,13 +29,39 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Simple runtime guard helpers for callers that require Firebase to be configured.
-export const IS_FIREBASE_CONFIGURED = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+// Connect to Firebase local emulators when developing locally or when explicitly enabled
+// Enable by setting EXPO_USE_FIREBASE_EMULATOR=true or running with NODE_ENV=development
+const useEmulator = process.env.EXPO_USE_FIREBASE_EMULATOR === 'true' || process.env.NODE_ENV === 'development';
 
-export function ensureFirebaseConfigured(): void {
-  if (!IS_FIREBASE_CONFIGURED) {
-    throw new Error('Firebase is not configured. Ensure EXPO_FIREBASE_* or EXPO_PUBLIC_FIREBASE_* env vars are set.');
+if (useEmulator) {
+  try {
+    // Auth emulator (default port 9099)
+    // connectAuthEmulator is safe to call in browser and Node environments
+    connectAuthEmulator(auth, 'http://localhost:9099');
+  } catch (e) {
+    // ignore if function not available or fails
+    // eslint-disable-next-line no-console
+    console.warn('connectAuthEmulator failed', String(e));
   }
+
+  try {
+    // Firestore emulator (configured port 8200)
+    connectFirestoreEmulator(db, 'localhost', 8200);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('connectFirestoreEmulator failed', String(e));
+  }
+
+  try {
+    // Storage emulator (default port 9199)
+    connectStorageEmulator(storage, 'localhost', 9199);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('connectStorageEmulator failed', String(e));
+  }
+
+  // eslint-disable-next-line no-console
+  console.info('Firebase: connected to local emulators (auth:9099, firestore:8200, storage:9199)');
 }
 
 export { app, auth, db, storage };

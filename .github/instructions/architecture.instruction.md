@@ -1,3 +1,27 @@
+# Architecture Overview
+
+## PROJECT STRUCTURE
+
+app/
+(tabs)/
+_layout.tsx # Bottom navigation
+index.tsx # Home
+forecasts/
+_layout.tsx # 5 sub-tabs
+library.tsx # Saved locations
+_layout.tsx # Root layout
+src/
+components/ # Shared UI
+lib/
+firebase.ts # Local emulator config
+queryClient.ts # React Query setup
+
+## CORE FEATURES
+- Weather data (BMKG API)
+- Local Firebase emulator  
+- Material Design 3 theme
+- Offline-first with React Query
+- Hot reload development
 # Architecture Instructions for inspirasi-app
 
 ## 📱 Indonesian Marine Weather Early Warning System

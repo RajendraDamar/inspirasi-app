@@ -7,8 +7,10 @@
 
 Based on our instruction files and 2025 best practices, here's our complete frontend technology stack:
 
-### **Core Framework**
-- **Expo SDK 51+** with TypeScript
+-### **Core Framework**
+- **Expo SDK 53 (target for this repository)** with TypeScript
+  
+> Note: This repository targets Expo SDK 53; instructions and examples assume SDK 53-compatible packages and Metro/web behavior.
 - **React Native 0.74+** 
 - **Expo Router 4.0+** (file-based routing)
 - **React Native Paper 5.0+** (Material Design 3)
@@ -402,7 +404,7 @@ import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
-  apiKey: "REDACTED_FIREBASE_API_KEY",
+  apiKey: "YOUR_FIREBASE_API_KEY_HERE",
   authDomain: "inspirasi-1.firebaseapp.com", 
   projectId: "inspirasi-1",
   storageBucket: "inspirasi-1.firebasestorage.app",

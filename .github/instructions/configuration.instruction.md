@@ -13,7 +13,7 @@ import { getMessaging } from 'firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
-  apiKey: "REDACTED_FIREBASE_API_KEY",
+  apiKey: "YOUR_FIREBASE_API_KEY_HERE",
   authDomain: "inspirasi-1.firebaseapp.com",
   projectId: "inspirasi-1",
   storageBucket: "inspirasi-1.firebasestorage.app",
