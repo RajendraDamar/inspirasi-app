@@ -6,7 +6,7 @@ const rnp = require('react-native-paper');
 const Text: any = rnp.Text || rnp.default?.Text || ((props: any) => null);
 const Button: any = rnp.Button || rnp.default?.Button || ((props: any) => null);
 const Switch: any = rnp.Switch || rnp.default?.Switch || ((props: any) => null);
-const RadioButton: any = rnp.RadioButton || rnp.default?.RadioButton || ((props: any) => null);
+const SegmentedButtons: any = rnp.SegmentedButtons || rnp.default?.SegmentedButtons || ((props: any) => null);
 const TextInput: any = rnp.TextInput || rnp.default?.TextInput || ((props: any) => null);
 const List: any = rnp.List || rnp.default?.List || ((props: any) => null);
 const Divider: any = rnp.Divider || rnp.default?.Divider || ((props: any) => null);
@@ -30,72 +30,71 @@ function SettingsForm() {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.section}>
-        <Text variant="titleLarge">User Profile</Text>
-  <List.Item title={auth?.user?.displayName || 'Guest'} description={auth?.user?.email || ''} />
-      </View>
+      <List.Section title="Account" style={styles.section}>
+        <List.Item
+          title={auth?.user?.displayName || 'Guest'}
+          description={auth?.user?.email || ''}
+          left={() => <List.Icon icon="account" />}
+        />
+        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+          <Text variant="bodyMedium">{auth?.user?.role || 'User'}</Text>
+        </View>
+      </List.Section>
 
       <Divider />
 
-      <View style={styles.section}>
-        <Text variant="titleLarge">Language</Text>
-        <RadioButton.Group
-          onValueChange={(v: string) => setLocal({ ...local, language: v })}
-          value={local.language}
-        >
-          <RadioButton.Item label="Bahasa Indonesia" value="id" />
-          <RadioButton.Item label="English" value="en" />
-        </RadioButton.Group>
-      </View>
+      <List.Section title="Preferences" style={styles.section}>
+        <List.Item title="Theme" description="App theme preference" />
+        <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+          <SegmentedButtons
+            value={local.theme}
+            onValueChange={(v: any) => setLocal({ ...local, theme: v })}
+            buttons={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }, { value: 'system', label: 'System' }]}
+          />
+        </View>
+
+        <List.Item title="Language" description={local.language === 'id' ? 'Bahasa' : 'English'} />
+        <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+          <SegmentedButtons
+            value={local.language}
+            onValueChange={(v: any) => setLocal({ ...local, language: v })}
+            buttons={[{ value: 'id', label: 'Bahasa' }, { value: 'en', label: 'English' }]}
+          />
+        </View>
+
+        <List.Item title="Location" description={local.defaultLocationCode || 'Not set'} right={() => <Button onPress={() => {}}>Change</Button>} />
+      </List.Section>
 
       <Divider />
 
-      <View style={styles.section}>
-        <Text variant="titleLarge">Notifications</Text>
-  <View style={styles.row}><Text>Push</Text><Switch value={!!local.notifications?.push} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, push: v } })} /></View>
-  <View style={styles.row}><Text>Email</Text><Switch value={!!local.notifications?.email} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, email: v } })} /></View>
-  <View style={styles.row}><Text>SMS</Text><Switch value={!!local.notifications?.sms} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, sms: v } })} /></View>
-      </View>
+      <List.Section title="Notifications" style={styles.section}>
+        <List.Item
+          title="Weather alerts"
+          right={() => <Switch value={!!local.notifications?.alerts} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, alerts: v } })} />}
+        />
+        <List.Item
+          title="Critical only"
+          right={() => <Switch value={!!local.notifications?.criticalOnly} onValueChange={(v: boolean) => setLocal({ ...local, notifications: { ...local.notifications, criticalOnly: v } })} />}
+        />
+      </List.Section>
 
       <Divider />
 
-      <View style={styles.section}>
-        <Text variant="titleLarge">Theme</Text>
-  <RadioButton.Group onValueChange={(v: string) => setLocal({ ...local, theme: v })} value={local.theme}>
-          <RadioButton.Item label="Light" value="light" />
-          <RadioButton.Item label="Dark" value="dark" />
-          <RadioButton.Item label="System" value="system" />
-        </RadioButton.Group>
-      </View>
+      <List.Section title="Data Privacy & Cache" style={styles.section}>
+        <List.Item title="Clear cached data" description="Remove offline caches and local DB" right={() => <Button mode="outlined" onPress={() => { /* implement clear cache */ }}>Clear</Button>} />
+        <List.Item title="Privacy policy" right={() => <Button onPress={() => { /* open policy */ }}>Open</Button>} />
+        <List.Item title="Offline mode" right={() => <Switch value={!!local.offlineMode} onValueChange={(v: boolean) => setLocal({ ...local, offlineMode: v })} />} />
+      </List.Section>
 
       <Divider />
 
-      <View style={styles.section}>
-        <Text variant="titleLarge">Data & Location</Text>
-  <TextInput label="Refresh interval (minutes)" keyboardType="numeric" value={String(local.refreshIntervalMinutes)} onChangeText={(t: string) => setLocal({ ...local, refreshIntervalMinutes: Number(t) || 0 })} />
-  <TextInput label="Default location code" value={local.defaultLocationCode || ''} onChangeText={(t: string) => setLocal({ ...local, defaultLocationCode: t })} />
-  <View style={styles.row}><Text>Use GPS</Text><Switch value={!!local.useGps} onValueChange={(v: boolean) => setLocal({ ...local, useGps: v })} /></View>
-      </View>
-
-      <Divider />
-
-      <View style={styles.section}>
-        <Text variant="titleLarge">Data Sources & Cache</Text>
-  <TextInput label="BMKG API endpoint" value={local.bmkgApiEndpoint || ''} onChangeText={(t: string) => setLocal({ ...local, bmkgApiEndpoint: t })} />
-  <TextInput label="Cache duration (minutes)" keyboardType="numeric" value={String(local.cacheDurationMinutes)} onChangeText={(t: string) => setLocal({ ...local, cacheDurationMinutes: Number(t) || 0 })} />
-  <View style={styles.row}><Text>Offline mode</Text><Switch value={!!local.offlineMode} onValueChange={(v: boolean) => setLocal({ ...local, offlineMode: v })} /></View>
-      </View>
-
-      <Divider />
-
-      <View style={styles.section}>
-        <Text variant="titleLarge">Security</Text>
-  <List.Item title={`Signed in: ${auth?.user ? 'Yes' : 'No'}`} />
-  {auth?.user ? <Button mode="outlined" onPress={() => auth.logout()}>Sign out</Button> : null}
-      </View>
+      <List.Section title="Data Sources" style={styles.section}>
+        <TextInput label="BMKG API endpoint" value={local.bmkgApiEndpoint || ''} onChangeText={(t: string) => setLocal({ ...local, bmkgApiEndpoint: t })} />
+        <TextInput label="Cache duration (minutes)" keyboardType="numeric" value={String(local.cacheDurationMinutes)} onChangeText={(t: string) => setLocal({ ...local, cacheDurationMinutes: Number(t) || 0 })} />
+      </List.Section>
 
       <View style={{ padding: 16 }}>
-  <Button mode="contained" onPress={async () => { await save(local); }}>Save preferences</Button>
+        <Button mode="contained" onPress={async () => { await save(local); }}>Save preferences</Button>
       </View>
     </ScrollView>
   );

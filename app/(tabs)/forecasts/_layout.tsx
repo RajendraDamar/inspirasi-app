@@ -12,22 +12,32 @@ export default function ForecastsLayout() {
     : 'index';
 
   const buttons = [
-    { value: 'index', label: 'Weather' },
-    { value: 'wind', label: 'Wind' },
-    { value: 'waves', label: 'Waves' },
-    { value: 'currents', label: 'Currents' },
-    { value: 'tides', label: 'Tides' },
+    { value: 'cuaca', label: 'Cuaca' },
+    { value: 'angin', label: 'Angin' },
+    { value: 'gelombang', label: 'Gelombang' },
+    { value: 'arus', label: 'Arus' },
+    { value: 'pasang-surut', label: 'Pasang Surut' },
   ];
 
   return (
     <View style={{ flex: 1 }}>
       <SegmentedButtons
         value={current}
-        onValueChange={(value: string) => 
-          router.replace(`/(tabs)/forecasts/${value === 'index' ? '' : value}`)
-        }
+        onValueChange={(value: string) => {
+          // Map Indonesian values to internal routes
+          const routeMap: Record<string,string> = {
+            'cuaca': '/(tabs)/forecasts',
+            'angin': '/(tabs)/forecasts/wind',
+            'gelombang': '/(tabs)/forecasts/waves',
+            'arus': '/(tabs)/forecasts/currents',
+            'pasang-surut': '/(tabs)/forecasts/tides'
+          };
+          const target = routeMap[value] || '/(tabs)/forecasts';
+          router.replace(target);
+        }}
         buttons={buttons}
         style={{ margin: 16 }}
+        theme={{ colors: { primary: '#1976D2' } }}
       />
       <Slot />
     </View>

@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import notificationSender from './notificationSender';
+import FCMTracker from './fcmService';
+import performanceLogger from '../metrics/performanceLogger';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -19,7 +21,7 @@ Notifications.setNotificationHandler({
 class PushNotificationService {
   async registerForPushNotificationsAsync(userId?: string) {
     if (!Device.isDevice) {
-      console.log('Push notifications require a physical device');
+  console.debug('Push notifications require a physical device');
       return null;
     }
 
@@ -53,6 +55,42 @@ class PushNotificationService {
     }
 
     return token;
+  }
+
+  attachReceiveHandlers() {
+    // Foreground receive
+    try {
+      Notifications.addNotificationReceivedListener((notification) => {
+        try {
+          const data = notification.request.content.data || {};
+          const sendTs = data?.sendTimestamp ? Number(data.sendTimestamp) : Date.now();
+          // log via tracker and store metric
+          FCMTracker.createMetric(sendTs, (data?.alertType as any) || 'general', 'foreground', true);
+        } catch (e) {
+          console.warn('Error in notification received handler', e);
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
+
+    // When the user interacts with a notification (background/response)
+    try {
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        try {
+          const data = response.notification.request.content.data || {};
+          const sendTs = data?.sendTimestamp ? Number(data.sendTimestamp) : Date.now();
+          // For background/interaction receives we mark deviceState as background
+          const metric = FCMTracker.createMetric(sendTs, (data?.alertType as any) || 'general', 'background', true);
+          // Also persist metric via performanceLogger (redundant but ensures local storage)
+          performanceLogger.log(metric as any).catch(() => {});
+        } catch (e) {
+          console.warn('Error in notification response handler', e);
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**

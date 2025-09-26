@@ -89,6 +89,19 @@ npm run eas:dev
 
 If you change navigation structure, keep `?e2e` behavior or update any external verification flows to account for new DOM structure.
 
+## Material Design 3 and Linear Gradient
+
+This branch adds Material Design 3 (MD3) themed components and a `WeatherCard` hero that can render a gradient background.
+
+Make sure to install the native gradient library before running the app so hero gradients render correctly:
+
+```powershell
+npm install
+npm install react-native-linear-gradient
+```
+
+After installing, rebuild native apps (or restart the dev server) so the native module is linked.
+
 Note about forced routes and bottom navigation
 - The app's forced-route (`?e2e=`) rendering bypasses the Tab.Navigator for deterministic DOM. To still show a bottom bar in forced screens, the project includes a standalone BottomNav fallback (`src/components/common/BottomNav.tsx`) which renders a visual bottom bar on forced pages and navigates by updating `?e2e` in the URL. This keeps forced pages predictable while allowing visual navigation for screenshots and manual verification.
 

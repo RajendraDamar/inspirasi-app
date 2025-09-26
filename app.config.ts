@@ -4,8 +4,18 @@ export default ({ config }: { config: any }) => ({
   ...config,
   experiments: { typedRoutes: true },
   expo: {
-    name: process.env.EXPO_APP_NAME || 'inspirasi-app',
+    // explicit app identity for PWA and stores
+    name: process.env.EXPO_APP_NAME || 'INSPIRASI',
     slug: process.env.EXPO_SLUG || 'inspirasi-app',
+    plugins: ['expo-router'],
+    web: {
+      bundler: 'metro',
+      output: 'static',
+      favicon: './assets/icon.png',
+    },
+    // PWA / theming defaults
+    backgroundColor: process.env.EXPO_BACKGROUND_COLOR || '#F5F5F5',
+    themeColor: process.env.EXPO_THEME_COLOR || '#1976D2',
     extra: {
       firebaseApiKey: process.env.FIREBASE_API_KEY || null,
       // public key for web builds and runtime access; prefer EXPO_PUBLIC_* for web-safe values
