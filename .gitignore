@@ -27,3 +27,6 @@ package-lock.json
 google-services.json
 GoogleService-Info.plist
 **/firebase-config.js
+
+# Ignore Playwright MCP artifacts archived in repository (large binary captures)
+.playwright-mcp/

@@ -1,4 +1,0 @@
-````markdown
-# 🏗️ MISSING FEATURES IMPLEMENTATION GUIDE
-...
-````

@@ -48,7 +48,6 @@ class BMKGService {
         try {
           const resp = await fetch(`${process.env.EXPO_PUBLIC_BMKG_WEATHER_API || this.baseURL}?adm4=${locationCode}`, { signal: AbortSignal.timeout(10000) });
           if (!resp.ok) {
-            lastErr = new Error(`BMKG HTTP ${resp.status}`);
             // treat 4xx/5xx as retriable for a small number of attempts
             attempt++;
             if (attempt <= maxAttempts) await new Promise(r => setTimeout(r, 500 * attempt));
