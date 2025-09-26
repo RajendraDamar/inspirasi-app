@@ -3,6 +3,9 @@ import { RefreshControl, StyleSheet, View, FlatList, Dimensions } from 'react-na
 import { Card, Title, Paragraph, Text, Avatar, Button } from 'react-native-paper';
 import { useWeatherData } from '../../src/hooks/useWeatherData';
 import useReportsData from '../../src/hooks/useReportsData';
+import SkeletonCard from '../../src/components/SkeletonCard';
+import ErrorState from '../../src/components/ErrorState';
+import EmptyState from '../../src/components/EmptyState';
 
 // Paper Card subcomponents may not be typed consistently across versions; create safe aliases
 const CardContent: any = (Card as any).Content || ((props: any) => props.children);
@@ -39,7 +42,7 @@ function ForecastCard({ item }: { item: any }) {
 }
 
 export default function HomeScreen() {
-  const { weather, refetch: refetchWeather } = useWeatherData();
+  const { weather, isLoading, isError, error, refetch: refetchWeather } = useWeatherData();
   const weatherAny: any = weather;
   const reportsQuery = useReportsData();
   const [refreshing, setRefreshing] = React.useState(false);
@@ -65,7 +68,15 @@ export default function HomeScreen() {
       ListHeaderComponent={() => (
         <View style={styles.container}>
           {/* Hero */}
-          <HeroCard weather={weatherAny?.current || weatherAny?.forecasts?.[0]} />
+          {isLoading ? (
+            <SkeletonCard />
+          ) : isError ? (
+            <ErrorState message={String(error?.message || 'Failed to load weather')} onRetry={() => refetchWeather?.()} />
+          ) : (!weatherAny || !weatherAny.forecasts || !weatherAny.forecasts.length) ? (
+            <EmptyState title="No weather data" description="No weather data available" />
+          ) : (
+            <HeroCard weather={weatherAny?.current || weatherAny?.forecasts?.[0]} />
+          )}
 
           {/* Today's Forecast carousel */}
           <View style={{ marginTop: 16 }}>
@@ -120,7 +131,7 @@ export default function HomeScreen() {
         </Card>
       )}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      ListEmptyComponent={<View style={{ padding: 16 }}><Paragraph>No reports yet.</Paragraph></View>}
+      ListEmptyComponent={<EmptyState title="No reports" description="No reports yet." />}
     />
   );
 }
